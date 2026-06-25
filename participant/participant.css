@@ -1,0 +1,97 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: beige;
+    font-family: Arial, sans-serif;
+}
+
+.buzzer-container {
+    position: relative;
+}
+
+h2{
+    color: white;
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-weight: 700;
+    font-style: bold;
+}
+
+h1{
+    position: absolute;
+    bottom: 60%;
+    color: black;
+    
+}
+
+/* Pulsing Glow Effect */
+.glow-pulse {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    background: rgba(255, 59, 48, 0.4);
+    animation: pulse 1.5s infinite;
+    z-index: 0;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+/* Main Buzzer Button */
+.buzzer {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff3b30);
+    border: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -8px 15px rgba(0, 0, 0, 0.5), inset 0 8px 15px rgba(255, 255, 255, 0.4);
+    transition: all 0.1s ease-in-out;
+}
+
+/* Base Ring */
+.buzzer::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    background: #d12a22;
+    z-index: -1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Press Animation */
+.buzzer:active {
+    transform: translateY(8px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 -4px 10px rgba(0, 0, 0, 0.6), inset 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.buzzer:active~.glow-pulse {
+    animation: none;
+    opacity: 0;
+}
