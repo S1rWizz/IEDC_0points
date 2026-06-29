@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="IEDC Quiz Night - Live Leaderboard & Jeopardy Board">
+    <title>IEDC Quiz Night — Leaderboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="/home" class="navbar-brand">
+            <span class="navbar-logo">IEDC QUIZ</span>
+            <span class="navbar-tag">Live</span>
+        </a>
+        <div class="navbar-links">
+            <a href="/home" class="active">Home</a>
+            <a href="/admin">Admin</a>
+        </div>
+    </nav>
+
+    <div class="page-container">
+
+        <!-- ═══ TOP HALF: Jeopardy Board ═══ -->
+        <div class="section-title">Question Board</div>
+        <div class="jeopardy-board" id="jeopardyBoard">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- ═══ BOTTOM HALF: Leaderboard Histogram ═══ -->
+        <div class="leaderboard-section">
+            <div class="section-title">Leaderboard</div>
+            <div id="histogramArea">
+                <!-- Rendered by JS -->
+            </div>
+            <div class="histogram-baseline"></div>
+        </div>
+
+    </div>
+
+    <script src="/js/data.js"></script>
+    <script>
+        // ── Render the Jeopardy Board ──
+        function renderBoard() {
+            const data = getData();
+            const board = document.getElementById('jeopardyBoard');
+            board.innerHTML = '';
+
+            CATEGORIES.forEach(cat => {
+                const col = document.createElement('div');
+                col.className = 'category-column';
+
+                // Header
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = cat;
+                col.appendChild(header);
+
+                // Point cells
+                POINT_VALUES.forEach(pts => {
+                    const cell = document.createElement('div');
+                    cell.className = 'point-cell';
+                    cell.textContent = pts;
+                    const key = `${cat}-${pts}`;
+                    if (data.revealedCells && data.revealedCells[key]) {
+                        cell.classList.add('revealed');
+                    }
+                    col.appendChild(cell);
+                });
+
+                board.appendChild(col);
+            });
+        }
+
+        // ── Render the Histogram Leaderboard ──
+        const BAR_COLORS = [
+            'color-0', 'color-1', 'color-2', 'color-3',
+            'color-4', 'color-5', 'color-6', 'color-7'
+        ];
+        const MAX_BAR_HEIGHT = 280; // px
+
+        function renderHistogram() {
+            const data = getData();
+            const area = document.getElementById('histogramArea');
+
+            if (!data.teams || data.teams.length === 0) {
+                area.innerHTML = `
+                    <div class="no-teams-message">
+                        <span>📊</span>
+                        No teams yet — add teams from the Admin panel
+                    </div>`;
+                return;
+            }
+
+            const container = document.createElement('div');
+            container.className = 'histogram-container';
+
+            data.teams.forEach((team, i) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'histogram-bar-wrapper';
+                wrapper.style.animationDelay = `${i * 0.08}s`;
+
+                // Points label
+                const label = document.createElement('div');
+                label.className = 'bar-points-label';
+                label.textContent = team.points + ' pts';
+
+                // Bar
+                const bar = document.createElement('div');
+                bar.className = `histogram-bar ${BAR_COLORS[i % BAR_COLORS.length]}`;
+                const heightPx = Math.max(8, (team.points / 1000) * MAX_BAR_HEIGHT);
+                bar.style.height = heightPx + 'px';
+
+                // Team name
+                const name = document.createElement('div');
+                name.className = 'bar-team-name';
+                name.textContent = team.name;
+                name.title = team.name;
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(bar);
+                wrapper.appendChild(name);
+                container.appendChild(wrapper);
+            });
+
+            area.innerHTML = '';
+            area.appendChild(container);
+        }
+
+        // ── Initial Render ──
+        renderBoard();
+        renderHistogram();
+
+        // ── Listen for live updates from Admin ──
+        onDataUpdate(() => {
+            renderBoard();
+            renderHistogram();
+        });
+    </script>
+
+</body>
+</html>
